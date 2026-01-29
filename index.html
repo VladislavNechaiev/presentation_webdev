@@ -606,7 +606,11 @@
             /* Allow vertical scroll for tall slides on mobile */
             .reveal .slides {
                 overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                /* iOS momentum scrolling */
                 max-height: 100vh;
+                touch-action: pan-y !important;
+                /* Allow vertical touch scroll */
             }
 
             .reveal .slides section {
@@ -614,6 +618,8 @@
                 display: flex !important;
                 align-items: flex-start !important;
                 padding: 1rem 0.5rem !important;
+                touch-action: pan-y !important;
+                /* Allow vertical scroll on sections */
             }
 
             /* Reduce vertical spacing on mobile */
@@ -1032,8 +1038,8 @@
                 minScale: isMobile ? 0.5 : 0.2,
                 maxScale: isMobile ? 1.5 : 2.0,
 
-                // Mobile-friendly touch settings
-                touch: true,
+                // Disable touch gestures on mobile to allow vertical scroll
+                touch: !isMobile,
 
                 // Improve mobile performance
                 embedded: false,
