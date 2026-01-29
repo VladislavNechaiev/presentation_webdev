@@ -1047,6 +1047,32 @@
                 // Disable auto-slide on mobile for better UX
                 autoSlide: 0
             });
+
+            // Force enable vertical scroll on mobile iOS
+            if (isMobile) {
+                const slidesContainer = document.querySelector('.reveal .slides');
+
+                // Prevent Reveal.js from blocking vertical scroll
+                let touchStartY = 0;
+                let touchStartX = 0;
+
+                slidesContainer.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                    touchStartX = e.touches[0].clientX;
+                }, { passive: true });
+
+                slidesContainer.addEventListener('touchmove', (e) => {
+                    const touchY = e.touches[0].clientY;
+                    const touchX = e.touches[0].clientX;
+                    const deltaY = Math.abs(touchY - touchStartY);
+                    const deltaX = Math.abs(touchX - touchStartX);
+
+                    // If vertical swipe is dominant, allow scrolling
+                    if (deltaY > deltaX) {
+                        e.stopPropagation();
+                    }
+                }, { passive: false });
+            }
         });
     </script>
 </body>
