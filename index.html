@@ -687,6 +687,17 @@
             min-height: 100vh;
         }
 
+        /* Show longread on mobile by default */
+        @media (max-width: 768px) {
+            .mobile-longread {
+                display: block;
+            }
+
+            .reveal {
+                display: none;
+            }
+        }
+
         .longread-section {
             min-height: 100vh;
             padding: 4rem 1.5rem;
