@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Strategy Proposal</title>
+
+    <!-- Reveal.js Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css" id="theme">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* SF Pro Display/Text font face (fallback to Inter) */
+        @supports (font-family: -apple-system) {
+            :root {
+                --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+                --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+            }
+        }
+
+        @supports not (font-family: -apple-system) {
+            :root {
+                --font-display: "Inter", sans-serif;
+                --font-text: "Inter", sans-serif;
+            }
+        }
+    </style>
+
+    <style>
+        /* --- iOS 2026 COLOR SYSTEM --- */
+        :root {
+            --apple-blue: #007AFF;
+            --apple-purple: #5856D6;
+            --apple-pink: #FF375F;
+            --apple-teal: #5AC8FA;
+            --neutral-100: #F5F5F7;
+            --neutral-900: #1D1D1F;
+            --neutral-600: #86868B;
+
+            /* Apple's easing */
+            --ease-out: cubic-bezier(0.28, 0, 0.63, 1);
+            --ease-in-out: cubic-bezier(0.45, 0, 0.40, 1);
+        }
+
+        /* --- GLOBAL RESET --- */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background-color: #000;
+            font-family: var(--font-text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- AMBIENT BACKGROUND (OPTIMIZED) --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            background: linear-gradient(135deg, #0a0a0f 0%, #000000 100%);
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(50px);
+            /* Reduced from 80px for performance */
+            opacity: 0.4;
+            /* Reduced for subtlety */
+            animation: float 16s infinite ease-in-out alternate;
+            will-change: transform;
+        }
+
+        .orb-1 {
+            top: -15%;
+            left: -10%;
+            width: 45vw;
+            height: 45vw;
+            background: linear-gradient(135deg, var(--apple-blue), var(--apple-purple));
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            bottom: -15%;
+            right: -10%;
+            width: 45vw;
+            height: 45vw;
+            background: linear-gradient(135deg, var(--apple-pink), var(--apple-purple));
+            animation-delay: -6s;
+        }
+
+        .orb-3 {
+            top: 35%;
+            left: 45%;
+            width: 25vw;
+            height: 25vw;
+            background: linear-gradient(135deg, var(--apple-teal), var(--apple-blue));
+            animation-delay: -12s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(40px, -40px, 0);
+            }
+        }
+
+        /* --- REVEAL.JS OVERRIDES --- */
+        .reveal {
+            z-index: 2;
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        /* Typography Override */
+        .reveal h1,
+        .reveal h2,
+        .reveal h3 {
+            font-family: var(--font-display);
+            text-transform: none;
+            color: white;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            /* Apple-style tight tracking */
+            line-height: 1.1;
+        }
+
+        .reveal p,
+        .reveal li,
+        .reveal span {
+            font-family: var(--font-text);
+            text-transform: none;
+            color: white;
+            line-height: 1.5;
+        }
+
+        /* --- GLASSMORPHISM COMPONENTS (REFINED) --- */
+        .slide-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            /* Lighter for Apple aesthetic */
+            backdrop-filter: blur(16px);
+            /* Reduced for performance */
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            /* More visible border */
+            border-radius: 20px;
+            /* Slightly reduced for cleaner look */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+                0 1px 2px rgba(0, 0, 0, 0.24);
+            /* Apple-style layered shadows */
+            transition: all 0.4s var(--ease-out);
+            will-change: transform, box-shadow;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18),
+                0 2px 4px rgba(0, 0, 0, 0.24);
+        }
+
+        .gradient-text {
+            background: linear-gradient(95deg, var(--apple-blue) 0%, var(--apple-purple) 50%, var(--apple-pink) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- ANIMATIONS (APPLE EASING) --- */
+        .reveal .slides section .fragment.fade-up {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(30px);
+            /* Reduced for subtlety */
+            will-change: opacity, transform;
+        }
+
+        .reveal .slides section .fragment.fade-up.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            transition: all 0.6s var(--ease-out);
+            /* Apple's signature easing */
+        }
+
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* --- CUSTOM COMPONENTS FOR NEW SLIDES --- */
+
+        /* About Me Slide */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat .number {
+            display: block;
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--apple-blue), var(--apple-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat .label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--neutral-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .tech-stack span {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Tech Stack Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .tech-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s var(--ease-out);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tech-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: white;
+        }
+
+        .tech-card p {
+            color: var(--neutral-600);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tech-card .benefit {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background: rgba(0, 122, 255, 0.15);
+            color: var(--apple-blue);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Timeline */
+        .timeline {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .timeline-item .step-number {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .timeline-item.highlighted .step-number {
+            background: var(--apple-blue);
+            border-color: var(--apple-blue);
+        }
+
+        .timeline-item .step-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item .step-content p {
+            color: var(--apple-blue);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-item .step-content .description {
+            color: var(--neutral-600);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Enhanced Pricing */
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--apple-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* CTA Buttons */
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 1rem 2rem;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-out);
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: black;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 40px rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--neutral-600);
+            font-size: 0.875rem;
+        }
+
+        .contact-item .icon {
+            font-size: 1.125rem;
+        }
+
+        .subtitle {
+            color: var(--neutral-600);
+            font-size: 1.125rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 768px) {
+
+            /* Reduce font sizes for mobile */
+            .reveal h1 {
+                font-size: 2.5rem !important;
+                line-height: 1.2;
+            }
+
+            .reveal h2 {
+                font-size: 1.75rem !important;
+                line-height: 1.3;
+            }
+
+            .reveal h3 {
+                font-size: 1.25rem !important;
+            }
+
+            .reveal p,
+            .reveal li {
+                font-size: 0.9rem !important;
+            }
+
+            /* Reduce padding/spacing */
+            .slide-content {
+                padding: 1rem;
+            }
+
+            .glass-card {
+                padding: 1.5rem !important;
+                border-radius: 16px;
+            }
+
+            /* Stack grids vertically on mobile */
+            .tech-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            /* Mobile-friendly buttons */
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            /* Contact info stacking */
+            .contact-info {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .contact-item {
+                font-size: 0.8rem;
+            }
+
+            /* Timeline adjustments */
+            .timeline-item {
+                gap: 1rem;
+            }
+
+            .timeline-item .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            /* Pricing cards */
+            .pricing-card {
+                margin-bottom: 1rem;
+            }
+
+            /* Reduce orb sizes for mobile performance */
+            .orb-1,
+            .orb-2 {
+                width: 60vw;
+                height: 60vw;
+                filter: blur(40px);
+            }
+
+            .orb-3 {
+                width: 35vw;
+                height: 35vw;
+                filter: blur(30px);
+            }
+
+            /* Subtitle */
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        /* Extra small devices (phones in portrait) */
+        @media (max-width: 480px) {
+            .reveal h1 {
+                font-size: 2rem !important;
+            }
+
+            .reveal h2 {
+                font-size: 1.5rem !important;
+            }
+
+            .glass-card {
+                padding: 1rem !important;
+            }
+
+            .tech-card {
+                padding: 1.25rem;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- SLIDE 1: INTRO -->
+            <section>
+                <div class="slide-content">
+                    <div class="glass-card px-6 py-2 rounded-full mb-8 fragment fade-up">
+                        <span class="text-blue-300 font-bold tracking-widest text-xs uppercase">Digital Strategy
+                            2026</span>
+                    </div>
+
+                    <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight text-center fragment fade-up">
+                        Веб-сайт как<br>
+                        <span class="gradient-text">Двигатель Продаж</span>
+                    </h1>
+
+                    <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10 text-center font-light fragment fade-up">
+                        Инженерный подход. Научные данные. Реальный результат.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SLIDE 2: ABOUT ME -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-4xl font-bold mb-8 text-center">Кто создаст ваш сайт?</h2>
+
+                    <div class="glass-card p-12 max-w-2xl fragment fade-up">
+                        <h3 class="text-3xl font-bold mb-2 text-center">Владислав</h3>
+                        <p class="text-center text-blue-400 font-semibold mb-6 text-lg">Full-Stack Разработчик</p>
+
+                        <div class="tech-stack">
+                            <span>Next.js</span>
+                            <span>React</span>
+                            <span>TypeScript</span>
+                            <span>Vercel</span>
+                            <span>Tailwind CSS</span>
+                        </div>
+
+                        <p class="text-center text-gray-400 mt-6">
+                            Специализация: премиальные сайты для салонов красоты и малого бизнеса
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 3: THE PROBLEM (RESEARCH) -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-4xl font-bold mb-12 text-center">Почему клиенты <span
+                            class="text-red-400">уходят</span>?</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-6xl">
+                        <!-- ZMOT -->
+                        <div class="glass-card p-10 fragment fade-up">
+                            <div class="text-blue-400 text-xs font-bold uppercase mb-4 tracking-wider">Google Research
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">ZMOT (Нулевой момент)</h3>
+                            <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                                <strong>70% решения</strong> о покупке принимается <em>до</em> первого контакта.
+                            </p>
+                            <div class="p-3 bg-white/5 rounded-lg border border-white/5">
+                                <p class="text-sm text-gray-400">Нет сайта = Нет доверия.</p>
+                            </div>
+                        </div>
+
+                        <!-- Credibility -->
+                        <div class="glass-card p-10 fragment fade-up">
+                            <div class="text-purple-400 text-xs font-bold uppercase mb-4 tracking-wider">Stanford
+                                University</div>
+                            <h3 class="text-2xl font-bold mb-4">Фактор Доверия</h3>
+                            <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                                <strong>75% людей</strong> судят о надежности бизнеса по качеству сайта.
+                            </p>
+                            <div class="p-3 bg-white/5 rounded-lg border border-white/5">
+                                <p class="text-sm text-gray-400">Только Инстаграм = "Временный бизнес".</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 3: UX PSYCHOLOGY -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-4xl font-bold mb-10 text-center">Психология Лени (UX)</h2>
+
+                    <div class="glass-card p-12 max-w-4xl relative overflow-hidden fragment fade-up">
+                        <blockquote class="text-2xl font-light text-center leading-relaxed mb-8">
+                            "Каждое лишнее действие клиента снижает конверсию на <span
+                                class="text-red-400 font-bold">20%</span>."
+                        </blockquote>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <!-- Old Way -->
+                            <div class="p-6 rounded-2xl border border-red-500/30 bg-red-900/10">
+                                <h4 class="font-bold text-red-400 mb-2">Путь через Instagram</h4>
+                                <ul class="text-sm space-y-2 text-gray-400">
+                                    <li>1. Найти профиль</li>
+                                    <li>2. Найти номер</li>
+                                    <li>3. Сохранить контакт</li>
+                                    <li>4. Написать в WhatsApp</li>
+                                </ul>
+                            </div>
+
+                            <!-- New Way -->
+                            <div
+                                class="p-6 rounded-2xl border border-green-500/50 bg-green-900/20 transform scale-105 shadow-xl">
+                                <h4 class="font-bold text-green-400 mb-2">Путь через Сайт</h4>
+                                <div class="flex items-center justify-center h-20">
+                                    <button
+                                        class="px-6 py-2 bg-green-600 text-white rounded-full font-bold shadow-lg text-sm">
+                                        Записаться (1 клик)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 5: TECHNOLOGY STACK -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-5xl font-bold mb-4 text-center">Технологии мирового уровня</h2>
+                    <p class="subtitle">Инструменты, которые используют Apple, Netflix, Tesla</p>
+
+                    <div class="tech-grid fragment fade-up">
+                        <div class="tech-card">
+                            <div class="icon">⚡</div>
+                            <h3>Next.js</h3>
+                            <p>React-фреймворк от Vercel. SEO из коробки, молниеносная загрузка.</p>
+                            <span class="benefit">Google любит ваш сайт</span>
+                        </div>
+
+                        <div class="tech-card">
+                            <div class="icon">🚀</div>
+                            <h3>Vercel / Cloudflare</h3>
+                            <p>Глобальная CDN сеть. Сайт загружается за 0.8 сек в любой точке мира.</p>
+                            <span class="benefit">Wix грузится 5+ сек</span>
+                        </div>
+
+                        <div class="tech-card">
+                            <div class="icon">📅</div>
+                            <h3>Cal.com</h3>
+                            <p>Профессиональная онлайн-запись. Клиенты бронируют 24/7 без вашего участия.</p>
+                            <span class="benefit">+40% записей</span>
+                        </div>
+
+                        <div class="tech-card">
+                            <div class="icon">📝</div>
+                            <h3>Headless CMS</h3>
+                            <p>Вы меняете цены, фото, услуги сами через удобный интерфейс.</p>
+                            <span class="benefit">Без программиста</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 6: PRICING -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-5xl font-bold mb-12 text-center">Цены и Тарифы</h2>
+
+                    <div class="flex flex-col md:flex-row gap-6 items-stretch justify-center w-full max-w-7xl px-4">
+
+                        <!-- BASE -->
+                        <div class="glass-card p-8 w-full md:w-1/3 flex flex-col fragment fade-up">
+                            <div class="mb-4"><span
+                                    class="text-gray-400 text-xs font-bold uppercase tracking-widest border border-gray-600 rounded px-2 py-1">Start</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">База</h3>
+                            <div class="text-4xl font-black mb-6">1000 ₪</div>
+                            <ul class="space-y-3 text-gray-300 text-sm flex-grow">
+                                <li class="flex gap-2"><span>✓</span> Одностраничник (Landing)</li>
+                                <li class="flex gap-2"><span>✓</span> Контактная форма</li>
+                                <li class="flex gap-2"><span>✓</span> Google Maps интеграция</li>
+                                <li class="flex gap-2"><span>✓</span> Мобильная адаптация</li>
+                            </ul>
+                        </div>
+
+                        <!-- FULL PACK -->
+                        <div
+                            class="glass-card p-8 w-full md:w-1/3 flex flex-col relative border-blue-500/50 shadow-[0_0_60px_rgba(59,130,246,0.2)] fragment fade-up transform md:-translate-y-6 bg-white/10">
+                            <div class="absolute top-0 right-0 bg-blue-600 px-3 py-1 rounded-bl-lg text-xs font-bold">
+                                HIT</div>
+                            <div class="mb-4"><span
+                                    class="text-blue-300 text-xs font-bold uppercase tracking-widest border border-blue-500 rounded px-2 py-1">Business</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">Всё включено</h3>
+                            <div class="text-4xl font-black mb-6 gradient-text">2000 ₪</div>
+                            <ul class="space-y-3 text-white text-sm flex-grow">
+                                <li class="flex gap-2 font-bold"><span class="text-green-400">✓</span> Всё из тарифа
+                                    "База"</li>
+                                <li class="flex gap-2"><span>✓</span> До 10 страниц</li>
+                                <li class="flex gap-2"><span>✓</span> Онлайн-запись Cal.com</li>
+                                <li class="flex gap-2"><span>✓</span> Headless CMS (вы меняете контент)</li>
+                                <li class="flex gap-2"><span>✓</span> Многоязычность (3 языка)</li>
+                                <li class="flex gap-2"><span>✓</span> SEO-оптимизация</li>
+                            </ul>
+                        </div>
+
+                        <!-- SUPPORT -->
+                        <div class="glass-card p-8 w-full md:w-1/3 flex flex-col fragment fade-up bg-white/5">
+                            <div class="mb-4"><span
+                                    class="text-gray-400 text-xs font-bold uppercase tracking-widest border border-gray-600 rounded px-2 py-1">Service</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">Первый месяц бесплатно</h3>
+                            <p class="text-sm text-gray-400 mb-6">150 ₪ / месяц после</p>
+                            <ul class="space-y-3 text-gray-400 text-sm flex-grow">
+                                <li class="flex gap-2">✓ Хостинг Vercel/Cloudflare</li>
+                                <li class="flex gap-2">✓ Неограниченные правки контента</li>
+                                <li class="flex gap-2">✓ Мониторинг 24/7</li>
+                                <li class="flex gap-2">✓ Бэкапы и безопасность</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 7: PROCESS & TIMELINE -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-5xl font-bold mb-12 text-center">Как мы работаем</h2>
+
+                    <div class="timeline fragment fade-up">
+                        <div class="timeline-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Консультация</h3>
+                                <p>30 минут · Бесплатно</p>
+                                <span class="description">Обсуждаем ваши цели, целевую аудиторию, конкурентов</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Дизайн</h3>
+                                <p>2-3 дня</p>
+                                <span class="description">Показываю макет. Вносим правки до полного одобрения</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Разработка</h3>
+                                <p>5-10 дней</p>
+                                <span class="description">Создаю сайт, интегрирую Cal.com, настраиваю CMS</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>Запуск</h3>
+                                <p>1 день</p>
+                                <span class="description">Публикуем сайт, подключаем домен, настраиваем аналитику</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item highlighted">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h3>Поддержка</h3>
+                                <p>1 месяц бесплатно</p>
+                                <span class="description">Помогаю освоиться с CMS, исправляю любые недочеты</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 8: DEMO -->
+            <section>
+                <div class="slide-content">
+                    <h2 class="text-5xl md:text-7xl font-black mb-8 text-center leading-tight">
+                        Меньше слов.<br>
+                        <span class="gradient-text">Больше Дела.</span>
+                    </h2>
+
+                    <div class="glass-card p-12 max-w-3xl text-center fragment fade-up">
+                        <p class="text-xl mb-8 font-light text-gray-200">
+                            Я подготовил персональную демо-версию сайта для салона красоты.<br>
+                            Давайте обсудим, как адаптировать его под ваш бизнес.
+                        </p>
+
+                        <div class="cta-buttons">
+                            <a href="#" onclick="Reveal.slide(0); return false;" class="btn-primary">
+                                Просмотреть презентацию снова →
+                            </a>
+                            <a href="https://wa.me/972538271828" target="_blank" class="btn-secondary">
+                                📱 Обсудить проект
+                            </a>
+                        </div>
+
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <span class="icon">📱</span>
+                                <a href="tel:+972538271828"
+                                    style="color: inherit; text-decoration: none;">+972-53-827-1828</a>
+                            </div>
+                            <div class="contact-item">
+                                <span class="icon">✉️</span>
+                                <a href="mailto:vladislavnechaiev@gmail.com"
+                                    style="color: inherit; text-decoration: none;">vladislavnechaiev@gmail.com</a>
+                            </div>
+                            <div class="contact-item">
+                                <span class="icon">💬</span>
+                                <a href="https://t.me/blvde_eternval" target="_blank"
+                                    style="color: inherit; text-decoration: none;">@blvde_eternval</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+
+    <script>
+        // Инициализация после загрузки страницы
+        window.addEventListener('load', () => {
+            // Detect device type
+            const isMobile = window.innerWidth <= 768;
+
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                center: true,
+                hash: false,
+                history: false,
+                transition: 'fade',
+                backgroundTransition: 'fade',
+
+                // Adaptive sizing based on device
+                width: isMobile ? '100%' : 1200,
+                height: isMobile ? '100%' : 800,
+                margin: isMobile ? 0.02 : 0.04,
+                minScale: isMobile ? 0.5 : 0.2,
+                maxScale: isMobile ? 1.5 : 2.0,
+
+                // Mobile-friendly touch settings
+                touch: true,
+
+                // Improve mobile performance
+                embedded: false,
+
+                // Disable auto-slide on mobile for better UX
+                autoSlide: 0
+            });
+        });
+    </script>
+</body>
+
+</html>
