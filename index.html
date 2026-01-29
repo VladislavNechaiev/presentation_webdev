@@ -1055,11 +1055,13 @@
                 // Prevent Reveal.js from blocking vertical scroll
                 let touchStartY = 0;
                 let touchStartX = 0;
+                let isScrolling = false;
 
                 slidesContainer.addEventListener('touchstart', (e) => {
                     touchStartY = e.touches[0].clientY;
                     touchStartX = e.touches[0].clientX;
-                }, { passive: true });
+                    isScrolling = false;
+                }, { passive: true, capture: true });
 
                 slidesContainer.addEventListener('touchmove', (e) => {
                     const touchY = e.touches[0].clientY;
